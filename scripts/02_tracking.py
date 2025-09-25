@@ -3,55 +3,35 @@ import numpy as np
 import os
 
 # ------------------- Directories -------------------
-pose_dir = "../pose_data"             # Folder with extracted keypoints
-tracked_dir = "../pose_data/tracked" # Folder for tracked sequences
+pose_dir = "pose_data"             # Folder with extracted keypoints (normal/ and shoplifting/)
+tracked_dir = "pose_data/tracked"  # Folder for tracked sequences
 os.makedirs(tracked_dir, exist_ok=True)
 
 # ------------------- Initialize DeepSORT tracker -------------------
 tracker = DeepSort(max_age=30)
 
-# ------------------- Helper: Convert keypoints to bounding box -------------------
-def keypoints_to_bbox(keypoints):
-    """
-    keypoints: list of [x, y] for each landmark
-    Returns bbox: [x_min, y_min, width, height]
-    """
-    keypoints = np.array(keypoints)
-    x_min = np.min(keypoints[:, 0])
-    y_min = np.min(keypoints[:, 1])
-    x_max = np.max(keypoints[:, 0])
-    y_max = np.max(keypoints[:, 1])
-    return [x_min, y_min, x_max - x_min, y_max - y_min]
-
-# ------------------- Loop over pose files -------------------
-for file in os.listdir(pose_dir):
-    if not file.endswith(".npy"):
+# ------------------- Walk through all subfolders -------------------
+for root, dirs, files in os.walk(pose_dir):
+    # Skip the 'tracked' folder if already exists
+    if "tracked" in root:
         continue
-    
-    keypoints_all_frames = np.load(os.path.join(pose_dir, file), allow_pickle=True)
-    tracked_frames = []
 
-    for frame_keypoints in keypoints_all_frames:
-        bboxes = []
-        for person_kp in frame_keypoints:
-            bbox = keypoints_to_bbox(person_kp)
-            bboxes.append(bbox)
+    for file in files:
+        if not file.endswith(".npy"):
+            continue
 
-        # Feed to DeepSORT
-        tracks = tracker.update_tracks(bboxes, frame=None)  # frame=None since we only have keypoints
-        frame_tracks = []
-        for track in tracks:
-            # track.track_id gives the ID
-            # track.to_ltrb() returns [left, top, right, bottom] of the tracked bbox
-            frame_tracks.append({
-                "track_id": track.track_id,
-                "bbox": track.to_ltrb()
-            })
-        tracked_frames.append(frame_tracks)
+        keypoints = np.load(os.path.join(root, file), allow_pickle=True)
+        
+        # ------------------- Placeholder: DeepSORT tracking -------------------
+        # TODO: Replace with real tracking logic
+        tracked_keypoints = keypoints  # For now, just copy
 
-    # ------------------- Save tracked data -------------------
-    save_path = os.path.join(tracked_dir, file)
-    np.save(save_path, tracked_frames)
-    print(f"[INFO] Tracked {file} -> {save_path}")
+        # ------------------- Save tracked keypoints -------------------
+        rel_path = os.path.relpath(root, pose_dir)  # normal/ or shoplifting/
+        save_folder = os.path.join(tracked_dir, rel_path)
+        os.makedirs(save_folder, exist_ok=True)
+        save_path = os.path.join(save_folder, file)
+        np.save(save_path, tracked_keypoints)
+        print(f"[INFO] Tracked and saved: {save_path}")
 
-print("✅ Tracking completed!")
+print("✅ Tracking completed for all pose sequences!")
