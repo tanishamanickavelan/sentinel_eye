@@ -1,0 +1,8 @@
+opencv-python
+mediapipe
+torch
+torchvision
+numpy
+pandas
+matplotlib
+deep_sort_realtime
