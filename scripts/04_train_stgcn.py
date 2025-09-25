@@ -8,8 +8,11 @@ from torch.utils.data import Dataset, DataLoader
 # --------- Custom Dataset ---------
 class GraphDataset(Dataset):
     def __init__(self, graph_dir, labels_csv):
-        self.graph_files = [f for f in os.listdir(graph_dir) if f.endswith("_graph.npy")]
-        self.graph_dir = graph_dir
+        self.graph_files = []
+        for root, dirs, files in os.walk(graph_dir):
+            for f in files:
+                if f.endswith("_graph.npy"):
+                    self.graph_files.append(os.path.join(root, f))
         self.labels = {}
         with open(labels_csv, "r") as f:
             next(f)  # skip header
@@ -21,12 +24,13 @@ class GraphDataset(Dataset):
         return len(self.graph_files)
 
     def __getitem__(self, idx):
-        file = self.graph_files[idx]
-        data = np.load(os.path.join(self.graph_dir, file), allow_pickle=True).item()
-        keypoints = np.array(data['keypoints'])  # Shape: T x J x 2
+        file_path = self.graph_files[idx]
+        data = np.load(file_path, allow_pickle=True).item()
+        keypoints = np.array(data['keypoints'])  # T x J x 2
         keypoints = torch.tensor(keypoints, dtype=torch.float32).permute(2,0,1)  # 2 x T x J
-        # Label from filename
-        base_name = file.replace("_graph.npy",".mp4")
+
+        # Extract base filename for label
+        base_name = os.path.basename(file_path).replace("_graph.npy",".mp4")
         label = torch.tensor(self.labels[base_name], dtype=torch.long)
         return keypoints, label
 
@@ -52,8 +56,8 @@ class STGCN(nn.Module):
         return self.fc(x)
 
 # --------- Training ---------
-graph_dir = "../graphs"
-labels_csv = "../labels.csv"
+graph_dir = "graphs"
+labels_csv = "labels.csv"
 dataset = GraphDataset(graph_dir, labels_csv)
 dataloader = DataLoader(dataset, batch_size=2, shuffle=True)
 
@@ -72,4 +76,4 @@ for epoch in range(5):  # small example
         optimizer.step()
     print(f"Epoch {epoch+1} Loss: {loss.item():.4f}")
 
-print("Training completed!")
+print("✅ Training completed!")
