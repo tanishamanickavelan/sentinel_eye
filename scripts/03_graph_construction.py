@@ -5,7 +5,9 @@ import os
 # ------------------- Directories -------------------
 pose_dir = "pose_data"             # Folder with extracted keypoints (normal/ and shoplifting/)
 tracked_dir = "pose_data/tracked"  # Folder for tracked sequences
+graph_dir = "graphs"               # Folder to save ST-GCN graphs
 os.makedirs(tracked_dir, exist_ok=True)
+os.makedirs(graph_dir, exist_ok=True)
 
 # ------------------- Initialize DeepSORT tracker -------------------
 tracker = DeepSort(max_age=30)
@@ -21,7 +23,7 @@ for root, dirs, files in os.walk(pose_dir):
             continue
 
         keypoints = np.load(os.path.join(root, file), allow_pickle=True)
-        
+
         # ------------------- Placeholder: DeepSORT tracking -------------------
         # TODO: Replace with real tracking logic
         tracked_keypoints = keypoints  # For now, just copy
@@ -34,4 +36,4 @@ for root, dirs, files in os.walk(pose_dir):
         np.save(save_path, tracked_keypoints)
         print(f"[INFO] Tracked and saved: {save_path}")
 
-print("✅ Tracking completed for all pose sequences!")
+print("✅ Tracking + Graph preparation completed for all pose sequences!")

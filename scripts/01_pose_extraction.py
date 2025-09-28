@@ -45,4 +45,8 @@ for root, dirs, files in os.walk(video_dir):
         print(f"[INFO] Saved: {save_path}")
 
 pose.close()
+<<<<<<< HEAD
 print("✅ Pose extraction completed for all videos!")
+=======
+print("✅ Pose extraction completed for all videos!")
+>>>>>>> 8f18dc003d78d752d07fb4075641556818283497
