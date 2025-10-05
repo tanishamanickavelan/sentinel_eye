@@ -81,10 +81,12 @@ WORKFLOW OVERVIEW:
         Database auto-updates the status.
         Includes a /reset_db route for clearing alerts and media during testing.
 
-
+# SUBMISSIONS
 DEMO VIDEO DRIVE LINK (Input is feed by playing an anomaly theft video in phone and keeping it near the laptop's camera): https://drive.google.com/file/d/1-upStSB6YTz32JGmad6ZZRpTs2g29IeD/view?usp=sharing 
 
 DEMO VIDEO DRIVE LINK (Real time demo where one of our teammate acts like stealing snacks in a supermarket for evaluating our sentinel eye project in real time): https://drive.google.com/file/d/1IaOZhS0DTTO5bWD_TvfpP-8oKJjdCH2r/view?usp=sharing
+
+Supplementary file drive link: https://drive.google.com/file/d/1I-GxP94fwNXsguTGAZgq2tmoO-OKQpOp/view?usp=sharing
 
 
 # HOW TO RUN OUR CODE: 
